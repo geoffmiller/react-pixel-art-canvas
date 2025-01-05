@@ -24,55 +24,46 @@ const ReactPixelArtCanvas: ForwardRefExoticComponent<
 
     return (
       <div
+        id="react-pixel-art-canvas-container"
+        className={settings.className}
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "20px",
+          width: CANVAS_WIDTH,
+          height: CANVAS_HEIGHT,
+          margin: "0 auto",
+          position: "relative",
+          ...settings.styles,
         }}
       >
-        <div
-          id="react-pixel-art-canvas-container"
-          style={{
-            border: "1px solid #ccc",
-            width: CANVAS_WIDTH,
-            height: CANVAS_HEIGHT,
-            margin: "0 auto",
-            position: "relative",
-          }}
-        >
-          <BackgroundCanvas
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            backgroundImage={backGroundCanvasSettings.backgroundImage}
-            backgroundOpacity={backGroundCanvasSettings.backgroundOpacity}
-            backgroundVisible={backGroundCanvasSettings.backgroundVisible}
-            styles={backGroundCanvasSettings.styles}
-            className={backGroundCanvasSettings.className}
-          />
-          <DrawingCanvas
-            ref={ref}
-            gridSize={settings.GRID_SIZE}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            pixelSize={PIXEL_SIZE}
-            selectedColor={selectedColor}
-            selectedTool={selectedTool}
-            styles={drawingCanvasSettings.styles}
-            className={drawingCanvasSettings.className}
-          />
-          <ForegroundCanvas
-            gridSize={settings.GRID_SIZE}
-            width={CANVAS_WIDTH}
-            height={CANVAS_HEIGHT}
-            pixelSize={PIXEL_SIZE}
-            foregroundVisible={foregroundCanvasSettings.foregroundVisible} // Add this prop
-            gridStrokeColor={foregroundCanvasSettings.gridStrokeColor}
-            styles={foregroundCanvasSettings.styles}
-            className={foregroundCanvasSettings.className}
-          />
-        </div>
+        <BackgroundCanvas
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          backgroundImage={backGroundCanvasSettings.backgroundImage}
+          backgroundOpacity={backGroundCanvasSettings.backgroundOpacity}
+          backgroundVisible={backGroundCanvasSettings.backgroundVisible}
+          styles={backGroundCanvasSettings.styles}
+          className={backGroundCanvasSettings.className}
+        />
+        <DrawingCanvas
+          ref={ref}
+          gridSize={settings.GRID_SIZE}
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          pixelSize={PIXEL_SIZE}
+          selectedColor={selectedColor}
+          selectedTool={selectedTool}
+          styles={drawingCanvasSettings.styles}
+          className={drawingCanvasSettings.className}
+        />
+        <ForegroundCanvas
+          gridSize={settings.GRID_SIZE}
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          pixelSize={PIXEL_SIZE}
+          foregroundVisible={foregroundCanvasSettings.foregroundVisible} // Add this prop
+          gridStrokeColor={foregroundCanvasSettings.gridStrokeColor}
+          styles={foregroundCanvasSettings.styles}
+          className={foregroundCanvasSettings.className}
+        />
       </div>
     );
   }

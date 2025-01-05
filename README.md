@@ -38,8 +38,7 @@ foregroundCanvasSettings.foregroundVisible: boolean
 
 ```tsx
 import { useRef } from "react";
-import { PixelArtCanvas } from "react-pixel-art-canvas";
-import type { Tool, CanvasRef } from "react-pixel-art-canvas";
+import { ReactPixelArtCanvas, Tool, CanvasRef } from "react-pixel-art-canvas";
 
 function App() {
   // This will give you a direct React.ref to the canvas where the drawing happens (drawingCanvas)
@@ -54,9 +53,11 @@ function App() {
     <ReactPixelArtCanvas
       ref={canvasRef}
       settings={{
-        GRID_SIZE: gridSize,
+        GRID_SIZE: 16,
         CANVAS_WIDTH: 896, //768 or 896 // canvas width should be divisible by GRID_SIZE(s)
         CANVAS_HEIGHT: 896,
+        className='...'
+        styles={{}} // applies to the container element with id "react-pixel-art-canvas-container"
       }}
       selectedColor={color}
       selectedTool={tool}
@@ -64,13 +65,18 @@ function App() {
         backgroundImage: img,
         backgroundOpacity: backgroundOpacity,
         backgroundVisible: showBackground,
+        className='...'
+        styles={{}} // applies to the bg canvas element with id "react-pixel-art-canvas-background"
       }}
       drawingCanvasSettings={{
-        ... nothing to set here ATM
+        className='...'
+        styles={{}} // applies to the bg canvas element with id "react-pixel-art-canvas-drawing"
       }}
       foregroundCanvasSettings={{
         foregroundVisible: showForeground,
         gridStrokeColor: "#d1d1d1",
+        className='...'
+        styles={{}} // applies to the bg canvas element with id "react-pixel-art-canvas-foreground"
       }}
     />
   );

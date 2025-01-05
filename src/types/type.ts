@@ -11,6 +11,8 @@ export type ReactPixelArtCanvasProps = {
     GRID_SIZE: number;
     CANVAS_WIDTH: number;
     CANVAS_HEIGHT: number;
+    styles?: React.CSSProperties;
+    className?: string;
   };
   backGroundCanvasSettings: {
     backgroundImage?: HTMLImageElement | null;

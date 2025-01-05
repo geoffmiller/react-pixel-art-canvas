@@ -116,6 +116,7 @@ function App() {
             GRID_SIZE: gridSize,
             CANVAS_WIDTH: 896, //768 or 896 // canvas width should be divisible by GRID_SIZE(s)
             CANVAS_HEIGHT: 896,
+            styles: { border: "1px solid #ccc" },
           }}
           selectedColor={color}
           selectedTool={tool}
