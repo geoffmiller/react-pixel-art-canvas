@@ -4,6 +4,8 @@
 
 # React Pixel Art Canvas
 
+Demo [https://stackblitz.com/edit/react-pixel-art-canvas](https://stackblitz.com/edit/react-pixel-art-canvas?file=src%2FApp.tsx)
+
 A simple, customizable, and headless pixel art canvas component for React applications.
 
 ## Installation
@@ -109,7 +111,11 @@ function App() {
 }
 ```
 
-## Running the Demo
+## Online Demo
+
+Online Demo [https://stackblitz.com/edit/react-pixel-art-canvas](https://stackblitz.com/edit/react-pixel-art-canvas?file=src%2FApp.tsx)
+
+## Running the Demo Locally
 
 _Demo created with the default Vite React-TS template_
 
@@ -145,11 +151,8 @@ It's "unstyled" in the sense that I did not modify the default CSS that ships wi
 
 ## TODO
 
-- clean up
 - add undo
-- work on responsive story
+- work on responsive design
 - decide if the image importer/cropper/alignment code should live in here
 - research [better flood fill algorithm performance](https://shaneosullivan.wordpress.com/2023/05/23/instant-colour-fill-with-html-canvas/) (plenty fast as is)
 - write tests
-- Set up a demo on [stackblitz](https://stackblitz.com/edit/vitejs-vite-22ekfvwp?file=index.html&terminal=dev) (who wants clone a whole repo just to play with a thing?)
-- package for npm
