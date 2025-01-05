@@ -1,7 +1,7 @@
 {
   "name": "react-pixel-art-canvas",
   "description": "A React component that uses the HTML Canvas to create pixel art.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Geoff Miller",
   "license": "MIT",
   "private": false,
