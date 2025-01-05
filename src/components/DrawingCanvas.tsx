@@ -1,18 +1,12 @@
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import React, { forwardRef, useRef, useState } from "react";
 import { canvasFloodFill } from "../utils/canvasFloodFill";
 import { Tool, CanvasRef } from "../types/type";
-import { canvasToSVG } from "../utils/canvasToSVG";
+import { useCanvasActions } from "../hooks/useCanvasActions";
 
 type DrawingCanvasProps = {
   width: number;
   height: number;
   gridSize: number;
-  pixelSize: number;
   selectedTool: Tool;
   selectedColor: string;
   styles?: React.CSSProperties;
@@ -25,7 +19,6 @@ export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
       width,
       height,
       gridSize = 16,
-      pixelSize,
       selectedColor,
       selectedTool,
       styles,
@@ -34,61 +27,41 @@ export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
     ref
   ) => {
     console.log("DrawingCanvas");
+    // constants
+    const PIXEL_SIZE = width / gridSize;
     const currentColor = selectedColor;
     const activeTool = selectedTool;
 
-    // state
-    const [isMouseDown, setIsMouseDown] = useState(false);
-
     // refs
     const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
+    // mouse state in ref to prevent unnecessary rerenders
+    const isMouseDown = useRef(false);
 
     // functions
     const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
-      setIsMouseDown(true);
-      handlePixelInteraction(event.clientX, event.clientY, event.button === 2);
+      isMouseDown.current = true;
+      handlePixelInteraction(event.clientX, event.clientY, event.buttons);
     };
 
     const handleMouseUp = () => {
-      setIsMouseDown(false);
+      isMouseDown.current = false;
     };
 
     const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (isMouseDown && (activeTool !== "fill" || event.button === 2)) {
-        handlePixelInteraction(
-          event.clientX,
-          event.clientY,
-          event.button === 2
-        );
+      if (
+        isMouseDown.current &&
+        (activeTool !== "fill" || event.buttons === 2)
+      ) {
+        handlePixelInteraction(event.clientX, event.clientY, event.buttons);
       }
     };
 
-    const handleClear = () => {
-      const canvas = drawingCanvasRef.current;
-      const ctx = canvas?.getContext("2d", { willReadFrequently: true });
-      if (ctx) {
-        ctx.clearRect(0, 0, width, height); // Clear the drawing canvas
-      }
-    };
-
-    const handleCanvasToSVG = () => {
-      return canvasToSVG(drawingCanvasRef.current!, gridSize);
-    };
-
-    const handleCanvasToPNG = () => {
-      return drawingCanvasRef.current?.toDataURL("image/png");
-    };
-
-    useImperativeHandle(ref, () => ({
-      clearCanvas: handleClear,
-      exportSVG: handleCanvasToSVG,
-      exportPNG: handleCanvasToPNG,
-    }));
+    useCanvasActions(drawingCanvasRef, ref, width, height, gridSize);
 
     const handlePixelInteraction = (
       x: number,
       y: number,
-      isErasing = false
+      mouseButton: number
     ) => {
       const canvas = drawingCanvasRef.current;
       const ctx = canvas?.getContext("2d", { willReadFrequently: true });
@@ -100,39 +73,32 @@ export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
         const rect = canvas.getBoundingClientRect();
         const scale = width / rect.width; // border is on the parent now
         // const scale = width / (rect.width + 2); //account for border ???
-        const col = Math.floor(((x - rect.left) * scale) / pixelSize);
-        const row = Math.floor(((y - rect.top) * scale) / pixelSize);
+        const col = Math.floor(((x - rect.left) * scale) / PIXEL_SIZE);
+        const row = Math.floor(((y - rect.top) * scale) / PIXEL_SIZE);
 
         if (col >= 0 && col < gridSize && row >= 0 && row < gridSize) {
-          if (isErasing) {
+          if (activeTool === "erase" || mouseButton === 2) {
             ctx.clearRect(
-              col * pixelSize,
-              row * pixelSize,
-              pixelSize,
-              pixelSize
+              col * PIXEL_SIZE,
+              row * PIXEL_SIZE,
+              PIXEL_SIZE,
+              PIXEL_SIZE
             );
-          } else if (activeTool === "fill") {
+          } else if (activeTool === "fill" || mouseButton === 4) {
             canvasFloodFill(
               ctx,
-              col * pixelSize,
-              row * pixelSize,
+              col * PIXEL_SIZE,
+              row * PIXEL_SIZE,
               currentColor,
-              pixelSize // Make sure this parameter is included
+              PIXEL_SIZE
             );
-          } else if (activeTool === "erase") {
-            ctx.clearRect(
-              col * pixelSize,
-              row * pixelSize,
-              pixelSize,
-              pixelSize
-            );
-          } else {
+          } else if (activeTool === "paint") {
             ctx.fillStyle = currentColor;
             ctx.fillRect(
-              col * pixelSize,
-              row * pixelSize,
-              pixelSize,
-              pixelSize
+              col * PIXEL_SIZE,
+              row * PIXEL_SIZE,
+              PIXEL_SIZE,
+              PIXEL_SIZE
             );
           }
         }

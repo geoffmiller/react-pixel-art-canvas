@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "author": "Geoff Miller",
   "license": "MIT",
+  "private": false,
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

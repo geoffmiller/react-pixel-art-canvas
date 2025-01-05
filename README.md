@@ -1,4 +1,4 @@
-# WIP: Only made to work for me ATM
+# Work in Progess - not ready for general use
 
 <img src="./docs/demo_screenshot.png">
 
@@ -22,63 +22,89 @@ It's composed of 3 canvas elements all stacked up as "layers" - `background | dr
 
 **background** - is used to add background images that you want to "trace" or reference. It can be toggled on/off.
 
-```ts
-backgroundCanvasSettings.backgroundVisible: boolean
-```
-
 **drawing** - this is were all the actually drawing happens. Cannot be toggled on/off.
 
 **foreground** - this is where we create a grid based on the pixel size set/selected. It can be toggled on/off
 
-```ts
-foregroundCanvasSettings.foregroundVisible: boolean
-```
-
 ## Usage
+
+See [demo/src/App.tsx](./demo/src/App.tsx) for a working example
 
 ```tsx
 import { useRef } from "react";
-import { ReactPixelArtCanvas, Tool, CanvasRef } from "react-pixel-art-canvas";
+import {
+  ReactPixelArtCanvas,
+  BackgroundCanvas,
+  DrawingCanvas,
+  ForegroundCanvas
+  Tool,
+  CanvasRef
+} from "react-pixel-art-canvas";
 
 function App() {
-  // This will give you a direct React.ref to the canvas where the drawing happens (drawingCanvas)
-  const canvasRef = useRef<CanvasRef>(null);
-  // ...as well as a few helper methods
-  const clear = canvasRef.current.clearCanvas();
-  const svg = canvasRef.current.exportSVG();
-  const png = canvasRef.current.exportPNG;
+  // Canvas setup - this could be stored in state
+  // canvas width/height should be divisible by GRID_SIZE(s)
+  const GRID_SIZE = 16;
+  const CANVAS_SIZE = {
+    width: 896,
+    height: 896,
+  };
+  // This will give you a direct React.ref to each canvas type
+  const drawingCanvasRef = useRef<CanvasRef>(null);
+  const backgroundCanvasRef = useRef<CanvasRef>(null);
+  const foregroundCanvasRef = useRef<CanvasRef>(null);
 
-  // Use the component with your desired settings
+  // All canvasRefs share a common interafce (CanvasRef)
+  // type CanvasRef = {
+  //   clearCanvas: () => void;
+  //   exportSVG: () => string | undefined;
+  //   exportPNG: () => string | undefined;
+  //   canvas: HTMLCanvasElement | null;
+  // };
+  const clear = drawingCanvasRef.current.clearCanvas();
+  const svg = drawingCanvasRef.current.exportSVG();
+  const png = drawingCanvasRef.current.exportPNG;
+  const canvasCtx = drawingCanvasRef.current.canvas.getContext("2d");
+
+  // Use the Canvas components with your desired settings
+  // Feel free to only use one or some of the Canvas components
   return (
-    <ReactPixelArtCanvas
-      ref={canvasRef}
-      settings={{
-        GRID_SIZE: 16,
-        CANVAS_WIDTH: 896, //768 or 896 // canvas width should be divisible by GRID_SIZE(s)
-        CANVAS_HEIGHT: 896,
-        className='...'
-        styles={{}} // applies to the container element with id "react-pixel-art-canvas-container"
-      }}
-      selectedColor={color}
-      selectedTool={tool}
-      backGroundCanvasSettings={{
-        backgroundImage: img,
-        backgroundOpacity: backgroundOpacity,
-        backgroundVisible: showBackground,
-        className='...'
-        styles={{}} // applies to the bg canvas element with id "react-pixel-art-canvas-background"
-      }}
-      drawingCanvasSettings={{
-        className='...'
-        styles={{}} // applies to the bg canvas element with id "react-pixel-art-canvas-drawing"
-      }}
-      foregroundCanvasSettings={{
-        foregroundVisible: showForeground,
-        gridStrokeColor: "#d1d1d1",
-        className='...'
-        styles={{}} // applies to the bg canvas element with id "react-pixel-art-canvas-foreground"
-      }}
-    />
+    <>
+      <ReactPixelArtCanvas
+        settings={{
+          GRID_SIZE: gridSize,
+          CANVAS_WIDTH: 896,
+          CANVAS_HEIGHT: 896,
+          styles: { border: "1px solid #ccc" },
+        }}
+      >
+        <BackgroundCanvas
+          ref={backgroundCanvasRef}
+          gridSize={gridSize}
+          width={CANVAS_SIZE.width}
+          height={CANVAS_SIZE.height}
+          backgroundImage={backgroundImage}
+          backgroundOpacity={backgroundOpacity}
+          backgroundVisible={showBackground}
+        />
+        <DrawingCanvas
+          ref={drawingCanvasRef}
+          gridSize={gridSize}
+          width={CANVAS_SIZE.width}
+          height={CANVAS_SIZE.height}
+          selectedColor={color}
+          selectedTool={tool}
+        />
+        <ForegroundCanvas
+          ref={foregroundCanvasRef}
+          gridSize={gridSize}
+          width={CANVAS_SIZE.width}
+          height={CANVAS_SIZE.height}
+          foregroundVisible={showForeground}
+          gridStrokeColor="#d1d1d1"
+        />
+      </ReactPixelArtCanvas>
+    </>
   );
 }
 ```
@@ -115,11 +141,12 @@ npm start
 
 The demo will be available at http://localhost:5173
 
-It's "unstyled" in the sense that I did not modify the default CSS that ships with the
+It's "unstyled" in the sense that I did not modify the default CSS that ships with the Vite react-ts template
 
 ## TODO
 
 - clean up
+- add undo
 - work on responsive story
 - decide if the image importer/cropper/alignment code should live in here
 - research [better flood fill algorithm performance](https://shaneosullivan.wordpress.com/2023/05/23/instant-colour-fill-with-html-canvas/) (plenty fast as is)

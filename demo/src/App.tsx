@@ -1,39 +1,48 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
-import ReactPixelArtCanvas from "../../src/components/ReactPixelArtCanvas";
+import { ReactPixelArtCanvas } from "../../src/components/ReactPixelArtCanvas";
+import { BackgroundCanvas } from "../../src/components/BackgroundCanvas";
+import { DrawingCanvas } from "../../src/components/DrawingCanvas";
+import { ForegroundCanvas } from "../../src/components/ForegroundCanvas";
 import { Tool, CanvasRef } from "../../src/types/type";
 
 function App() {
-  const canvasRef = useRef<CanvasRef>(null);
+  const GRID_SIZE = 16;
+  const CANVAS_SIZE = {
+    width: 896,
+    height: 896,
+  };
+  const drawingCanvasRef = useRef<CanvasRef>(null);
+  const backgroundCanvasRef = useRef<CanvasRef>(null);
+  const foregroundCanvasRef = useRef<CanvasRef>(null);
 
   const [tool, setTool] = useState<Tool>("paint");
-  const [color, setColor] = useState("#c90000");
+  const [color, setColor] = useState("#113db8");
   const [showBackground, setShowBackground] = useState(true);
   const [showForeground, setShowForeground] = useState(true);
-  const [gridSize, setGridSize] = useState(16);
+  const [gridSize, setGridSize] = useState(GRID_SIZE);
   const [backgroundOpacity, setBackgroundOpacity] = useState(1);
+  const [backgroundImage, setBackgroundImage] =
+    useState<HTMLImageElement | null>();
 
   const handleToolChange = (tool: Tool) => {
-    console.log(tool);
     setTool(tool);
   };
 
   const toggleForeground = () => {
-    console.log("toggleForeground");
     setShowForeground(!showForeground);
   };
 
   const toggleBackground = () => {
-    console.log("toggleBackground");
     setShowBackground(!showBackground);
   };
 
   const handleClear = () => {
-    canvasRef.current?.clearCanvas();
+    drawingCanvasRef.current?.clearCanvas();
   };
 
   const handleExportToSVG = () => {
-    const svg = canvasRef.current?.exportSVG();
+    const svg = drawingCanvasRef.current?.exportSVG();
     console.log(svg);
 
     if (!svg) return;
@@ -48,7 +57,7 @@ function App() {
 
   const handleExportToPNG = () => {
     // raw png data
-    const pngData = canvasRef.current?.exportPNG();
+    const pngData = drawingCanvasRef.current?.exportPNG();
     console.log(pngData);
 
     if (!pngData) return;
@@ -60,10 +69,13 @@ function App() {
     a.remove();
   };
 
-  // temp
-  const img = new Image();
-  img.src =
-    "https://images.unsplash.com/photo-1604383393193-ce637a2f9c17?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/flower-bg.png";
+    img.onload = () => {
+      setBackgroundImage(img);
+    };
+  }, []);
 
   return (
     <>
@@ -111,26 +123,39 @@ function App() {
           </div>
         </div>
         <ReactPixelArtCanvas
-          ref={canvasRef}
           settings={{
             GRID_SIZE: gridSize,
             CANVAS_WIDTH: 896, //768 or 896 // canvas width should be divisible by GRID_SIZE(s)
             CANVAS_HEIGHT: 896,
             styles: { border: "1px solid #ccc" },
           }}
-          selectedColor={color}
-          selectedTool={tool}
-          backGroundCanvasSettings={{
-            backgroundImage: img,
-            backgroundOpacity: backgroundOpacity,
-            backgroundVisible: showBackground,
-          }}
-          drawingCanvasSettings={{}}
-          foregroundCanvasSettings={{
-            foregroundVisible: showForeground,
-            gridStrokeColor: "#d1d1d1",
-          }}
-        />
+        >
+          <BackgroundCanvas
+            ref={backgroundCanvasRef}
+            gridSize={gridSize}
+            width={CANVAS_SIZE.width}
+            height={CANVAS_SIZE.height}
+            backgroundImage={backgroundImage}
+            backgroundOpacity={backgroundOpacity}
+            backgroundVisible={showBackground}
+          />
+          <DrawingCanvas
+            ref={drawingCanvasRef}
+            gridSize={gridSize}
+            width={CANVAS_SIZE.width}
+            height={CANVAS_SIZE.height}
+            selectedColor={color}
+            selectedTool={tool}
+          />
+          <ForegroundCanvas
+            ref={foregroundCanvasRef}
+            gridSize={gridSize}
+            width={CANVAS_SIZE.width}
+            height={CANVAS_SIZE.height}
+            foregroundVisible={showForeground}
+            gridStrokeColor="#d1d1d1"
+          />
+        </ReactPixelArtCanvas>
       </div>
     </>
   );
