@@ -1,6 +1,6 @@
 # Work in Progess - not ready for general use
 
-<img src="./docs/demo_screenshot.png">
+<img src="https://raw.githubusercontent.com/geoffmiller/react-pixel-art-canvas/refs/heads/main/docs/demo_screenshot.png">
 
 # React Pixel Art Canvas
 
