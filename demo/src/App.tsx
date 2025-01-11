@@ -12,10 +12,12 @@ function App() {
     width: 896,
     height: 896,
   };
+  // refs
   const drawingCanvasRef = useRef<CanvasRef>(null);
   const backgroundCanvasRef = useRef<CanvasRef>(null);
   const foregroundCanvasRef = useRef<CanvasRef>(null);
 
+  // state
   const [tool, setTool] = useState<Tool>("paint");
   const [color, setColor] = useState("#113db8");
   const [showBackground, setShowBackground] = useState(true);
@@ -25,6 +27,7 @@ function App() {
   const [backgroundImage, setBackgroundImage] =
     useState<HTMLImageElement | null>();
 
+  // actions
   const handleToolChange = (tool: Tool) => {
     setTool(tool);
   };
@@ -69,6 +72,11 @@ function App() {
     a.remove();
   };
 
+  const handleUndo = () => {
+    drawingCanvasRef.current?.undoHistory();
+  };
+
+  // set a background image on render
   useEffect(() => {
     const img = new Image();
     img.src = "/flower-bg.png";
@@ -83,6 +91,7 @@ function App() {
         <button onClick={() => handleToolChange("paint")}>paint</button>
         <button onClick={() => handleToolChange("erase")}>erase</button>
         <button onClick={() => handleToolChange("fill")}>fill</button>
+        <button onClick={handleUndo}>undo</button>
         <button onClick={handleClear}>clear</button>
         <div>
           <button onClick={toggleBackground}>
@@ -123,12 +132,9 @@ function App() {
           </div>
         </div>
         <ReactPixelArtCanvas
-          settings={{
-            GRID_SIZE: gridSize,
-            CANVAS_WIDTH: 896, //768 or 896 // canvas width should be divisible by GRID_SIZE(s)
-            CANVAS_HEIGHT: 896,
-            styles: { border: "1px solid #ccc" },
-          }}
+          width={CANVAS_SIZE.width}
+          height={CANVAS_SIZE.height}
+          styles={{ border: "1px solid #ccc" }}
         >
           <BackgroundCanvas
             ref={backgroundCanvasRef}
@@ -146,6 +152,7 @@ function App() {
             height={CANVAS_SIZE.height}
             selectedColor={color}
             selectedTool={tool}
+            history={true}
           />
           <ForegroundCanvas
             ref={foregroundCanvasRef}

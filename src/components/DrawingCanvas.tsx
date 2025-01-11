@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, useRef } from "react";
 import { canvasFloodFill } from "../utils/canvasFloodFill";
 import { Tool, CanvasRef } from "../types/type";
 import { useCanvasActions } from "../hooks/useCanvasActions";
@@ -11,6 +11,8 @@ type DrawingCanvasProps = {
   selectedColor: string;
   styles?: React.CSSProperties;
   className?: string;
+  history?: boolean;
+  historyMaxSize?: number; // TODO: implement historyMaxSize
 };
 
 export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
@@ -23,19 +25,29 @@ export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
       selectedTool,
       styles,
       className,
+      history,
     }: DrawingCanvasProps,
     ref
   ) => {
     console.log("DrawingCanvas");
-    // constants
-    const PIXEL_SIZE = width / gridSize;
-    const currentColor = selectedColor;
-    const activeTool = selectedTool;
-
     // refs
     const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
     // mouse state in ref to prevent unnecessary rerenders
     const isMouseDown = useRef(false);
+
+    // custom hooks
+    const { addToHistory } = useCanvasActions(
+      drawingCanvasRef,
+      ref,
+      width,
+      height,
+      gridSize
+    );
+
+    // constants
+    const PIXEL_SIZE = width / gridSize;
+    const currentColor = selectedColor;
+    const activeTool = selectedTool;
 
     // functions
     const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -44,6 +56,12 @@ export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
     };
 
     const handleMouseUp = () => {
+      if (history) {
+        const canvas = drawingCanvasRef.current;
+        const ctx = canvas?.getContext("2d", { willReadFrequently: true });
+        const png = canvas?.toDataURL("image/png");
+        png && addToHistory(png as string);
+      }
       isMouseDown.current = false;
     };
 
@@ -56,8 +74,6 @@ export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
       }
     };
 
-    useCanvasActions(drawingCanvasRef, ref, width, height, gridSize);
-
     const handlePixelInteraction = (
       x: number,
       y: number,
@@ -67,12 +83,8 @@ export const DrawingCanvas = forwardRef<CanvasRef, DrawingCanvasProps>(
       const ctx = canvas?.getContext("2d", { willReadFrequently: true });
 
       if (ctx && canvas) {
-        if (!isMouseDown) {
-          // saveToHistory();
-        }
         const rect = canvas.getBoundingClientRect();
-        const scale = width / rect.width; // border is on the parent now
-        // const scale = width / (rect.width + 2); //account for border ???
+        const scale = width / rect.width;
         const col = Math.floor(((x - rect.left) * scale) / PIXEL_SIZE);
         const row = Math.floor(((y - rect.top) * scale) / PIXEL_SIZE);
 

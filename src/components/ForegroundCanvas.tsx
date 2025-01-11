@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useEffect, useRef } from "react";
 import { CanvasRef } from "../types/type";
 import { useCanvasActions } from "../hooks/useCanvasActions";
+import { getContext2d } from "../utils/getContext2d";
 
 type ForegroundCanvasProps = {
   width: number;
@@ -34,8 +35,7 @@ export const ForegroundCanvas = forwardRef<CanvasRef, ForegroundCanvasProps>(
 
     // functions
     const drawGrid = useCallback(() => {
-      const gridCtx = foregroundCanvasRef.current?.getContext("2d");
-
+      const gridCtx = getContext2d(foregroundCanvasRef);
       if (gridCtx) {
         gridCtx.clearRect(0, 0, width, height);
 

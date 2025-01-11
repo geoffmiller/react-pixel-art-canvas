@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, forwardRef } from "react";
 import { CanvasRef } from "../types/type";
 import { useCanvasActions } from "../hooks/useCanvasActions";
+import { getContext2d } from "../utils/getContext2d";
 
 type BackgroundCanvasProps = {
   width: number;
@@ -33,9 +34,7 @@ export const BackgroundCanvas = forwardRef<CanvasRef, BackgroundCanvasProps>(
 
     // functions
     const drawBackground = useCallback(() => {
-      const bgCanvas = backgroundCanvasRef.current;
-      if (!bgCanvas) return;
-      const bgCtx = bgCanvas.getContext("2d");
+      const bgCtx = getContext2d(backgroundCanvasRef);
       if (!bgCtx) return;
 
       // Always clear the canvas first
